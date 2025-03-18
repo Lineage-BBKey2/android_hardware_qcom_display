@@ -1,6 +1,7 @@
 cc_library_shared {
     name: "libgpu_tonemapper",
     vendor: true,
+    defaults: ["display_defaults"],
 
     header_libs: [
         "display_headers",
@@ -18,6 +19,7 @@ cc_library_shared {
     cflags: [
         "-Wno-missing-field-initializers",
         "-Wall",
+        "-Wno-sign-conversion",
         "-Wno-unused-parameter",
         "-DLOG_TAG=\"GPU_TONEMAPPER\"",
     ],
