@@ -27,10 +27,15 @@ target_board_platform_cc_library_shared {
         "gr_buf_mgr.cpp",
         "gr_device_impl.cpp",
     ],
+    include_dirs: [
+        "system/memory/libion/include",
+        "system/memory/libion/kernel-headers",
+    ],
     shared_libs: [
         "libqdMetaData",
         "libsync",
         "libgrallocutils",
+        "libion",
         "android.hardware.graphics.common@1.1",
     ],
     cflags: [
