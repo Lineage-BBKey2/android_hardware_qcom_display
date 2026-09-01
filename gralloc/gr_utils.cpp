@@ -734,6 +734,18 @@ bool IsUBwcEnabled(int format, uint64_t usage) {
     return true;
   }
 
+  // Legacy SDM660 Adreno can intermittently corrupt ordinary RGBA
+  // application buffers when they use UBWC with the Gralloc4 graphics
+  // stack. Keep UBWC for the SurfaceFlinger client target and explicitly
+  // compressed formats, but force private-UBWC RGBA_8888 producer buffers
+  // to linear layout.
+  if (format == HAL_PIXEL_FORMAT_RGBA_8888 &&
+      !(usage & BufferUsage::COMPOSER_CLIENT_TARGET) &&
+      ((usage & GRALLOC_USAGE_PRIVATE_ALLOC_UBWC) ||
+       (usage & GRALLOC_USAGE_PRIVATE_ALLOC_UBWC_PI))) {
+    return false;
+  }
+
   // Allow UBWC, if an OpenGL client sets UBWC usage flag and GPU plus MDP
   // support the format. OR if a non-OpenGL client like Rotator, sets UBWC
   // usage flag and MDP supports the format.
