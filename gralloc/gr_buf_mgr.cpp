@@ -923,6 +923,10 @@ Error BufferManager::LockBuffer(const private_handle_t *hnd, uint64_t usage) {
     handle->flags |= private_handle_t::PRIV_FLAGS_NEEDS_FLUSH;
   }
 
+  if (err == Error::NONE) {
+    buf->IncLock();
+  }
+
   return err;
 }
 
@@ -932,7 +936,7 @@ Error BufferManager::FlushBuffer(const private_handle_t *handle) {
 
   private_handle_t *hnd = const_cast<private_handle_t *>(handle);
   auto buf = GetBufferFromHandleLocked(hnd);
-  if (buf == nullptr) {
+  if (buf == nullptr || !buf->IsLocked()) {
     return Error::BAD_BUFFER;
   }
 
@@ -950,7 +954,7 @@ Error BufferManager::RereadBuffer(const private_handle_t *handle) {
 
   private_handle_t *hnd = const_cast<private_handle_t *>(handle);
   auto buf = GetBufferFromHandleLocked(hnd);
-  if (buf == nullptr) {
+  if (buf == nullptr || !buf->IsLocked()) {
     return Error::BAD_BUFFER;
   }
 
@@ -968,7 +972,7 @@ Error BufferManager::UnlockBuffer(const private_handle_t *handle) {
 
   private_handle_t *hnd = const_cast<private_handle_t *>(handle);
   auto buf = GetBufferFromHandleLocked(hnd);
-  if (buf == nullptr) {
+  if (buf == nullptr || !buf->IsLocked()) {
     return Error::BAD_BUFFER;
   }
 
@@ -984,6 +988,8 @@ Error BufferManager::UnlockBuffer(const private_handle_t *handle) {
       status = Error::BAD_BUFFER;
     }
   }
+
+  buf->DecLock();
 
   return status;
 }

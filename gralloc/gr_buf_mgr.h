@@ -76,6 +76,8 @@ class BufferManager {
   struct Buffer {
     const private_handle_t *handle = nullptr;
     int ref_count = 1;
+    // Number of outstanding successful CPU locks on this imported handle.
+    uint32_t lock_count = 0;
     // Hold the main and metadata ion handles
     // Freed from the allocator process
     // and unused in the mapping process
@@ -87,6 +89,9 @@ class BufferManager {
         : handle(h), ion_handle_main(ih_main), ion_handle_meta(ih_meta) {}
     void IncRef() { ++ref_count; }
     bool DecRef() { return --ref_count == 0; }
+    void IncLock() { ++lock_count; }
+    void DecLock() { --lock_count; }
+    bool IsLocked() const { return lock_count != 0; }
     uint64_t reserved_size = 0;
     void *reserved_region_ptr = nullptr;
   };
